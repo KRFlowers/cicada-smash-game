@@ -38,7 +38,7 @@ This game was inspired by those summers when cicadas are everywhere. The goal is
 
 ## License
 
-Feel free to fork and modify for your own projects!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
