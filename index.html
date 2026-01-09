@@ -34,12 +34,12 @@
 .modal-content {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 48%;
     transform: translate(-50%, -50%);
     background-color: #f8f8f8;
-    padding: 30px;
+    padding: 20px;
     border: 1px solid #e0e0e0;
-    width: 500px;
+    width: 400px;
     max-width: 90%;
     max-height: 80vh;
     overflow-y: auto;
@@ -51,60 +51,61 @@
 .modal-content h2 {
     color: #228B22;
     margin-top: 0;
+    font-size: 22px;
 }
 
 .modal-content h3 {
     color: #333;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 18px;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-size: 16px;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin: 20px 0;
+    gap: 10px;
+    margin: 15px 0;
     text-align: left;
 }
 
 .stat-item {
     background: white;
-    padding: 12px;
+    padding: 8px;
     border-radius: 5px;
     border: 1px solid #ddd;
 }
 
 .stat-label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     color: #666;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .stat-value {
     display: block;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     color: #228B22;
 }
 
 .history-list {
-    max-height: 200px;
+    max-height: 150px;
     overflow-y: auto;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .history-item {
     background: white;
-    padding: 10px;
-    margin-bottom: 8px;
+    padding: 8px;
+    margin-bottom: 6px;
     border-radius: 5px;
     border: 1px solid #ddd;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: 11px;
 }
 
 .history-date {
@@ -121,19 +122,36 @@
 }
 
 .close-button {
-    margin-top: 20px;
-    padding: 12px 30px;
+    margin-top: 15px;
+    margin-right: 10px;
+    padding: 10px 25px;
     background-color: #228B22;
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
 }
 
 .close-button:hover {
     background-color: #1a6b1a;
+}
+
+.exit-button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.exit-button:hover {
+    background-color: #555;
 }
 
 </style>
@@ -397,6 +415,10 @@
         $(".close-button").click(function() {
             $("#gameOverDialog").hide();
         });
+        
+        $(".exit-button").click(function() {
+            $("#gameOverDialog").hide();
+        });
 
         $(window).click(function(event) {
             if ($(event.target).is("#gameOverDialog")) {
@@ -439,6 +461,7 @@
                 <div id="gameHistory"></div>
                 
                 <button class="close-button">Play Again</button>
+                <button class="exit-button">Exit</button>
             </div>
         </div>
 
