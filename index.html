@@ -153,6 +153,7 @@
         var hideClock;
         var imageCount = 0;
         var imageArray = [];
+        var secRemaining = 30;
         
         // Statistical tracking variables
         var totalClicks = 0;
@@ -210,7 +211,7 @@
        
         function startGame(){
             // When user presses start, initialize all gamespace elements and start game
-            var secRemaining = 30;
+            secRemaining = 30;
             userScore = 0;
             
             // Reset statistics
@@ -223,7 +224,7 @@
             gameStartTime = Date.now();
             
             window.location = "#gamespace";
-            var imageCount = 0;
+            imageCount = 0;
             imageArray = [];
             $('#playSounds')[0].play();
             $("#start_button").off("click");
