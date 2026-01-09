@@ -154,6 +154,36 @@
     background-color: #555;
 }
 
+.diff-easy {
+    background-color: #5cb85c;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.diff-medium {
+    background-color: #f0ad4e;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.diff-hard {
+    background-color: #d9534f;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
 </style>
 
 
@@ -172,6 +202,8 @@
         var imageCount = 0;
         var imageArray = [];
         var secRemaining = 30;
+        var currentDifficulty = 'medium';
+        var spawnRate = 600;
         
         // Statistical tracking variables
         var totalClicks = 0;
@@ -207,6 +239,23 @@
 
             });
 
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            switch(level) {
+                case 'easy':
+                    spawnRate = 900;
+                    break;
+                case 'medium':
+                    spawnRate = 600;
+                    break;
+                case 'hard':
+                    spawnRate = 350;
+                    break;
+            }
+            $('.difficulty-btn').removeClass('active');
+            $('#' + level + 'Btn').addClass('active');
+        }
+
         function randomNumberx(){
             return Math.floor((Math.random()*543));     
         }           
@@ -216,7 +265,7 @@
         }
 
         function randomNumberImage(){
-            return Math.floor((Math.random()*800));
+            return Math.floor((Math.random()*spawnRate));
         }
 
         function updateScore(){
@@ -336,6 +385,10 @@
                 <h3>Game Statistics</h3>
                 <div class="stats-grid">
                     <div class="stat-item">
+                        <span class="stat-label">Difficulty:</span>
+                        <span class="stat-value">${currentDifficulty.toUpperCase()}</span>
+                    </div>
+                    <div class="stat-item">
                         <span class="stat-label">Final Score:</span>
                         <span class="stat-value">${userScore}</span>
                     </div>
@@ -366,6 +419,7 @@
             saveGameHistory({
                 date: new Date().toLocaleDateString(),
                 score: userScore,
+                difficulty: currentDifficulty,
                 accuracy: accuracy,
                 catchRate: catchRate,
                 avgReactionTime: avgReactionTime
@@ -395,11 +449,12 @@
             
             var historyHTML = '<h3>Recent Performance</h3><div class="history-list">';
             history.slice().reverse().forEach(function(game, index) {
+                var diffBadge = game.difficulty ? `<span class="diff-${game.difficulty}">${game.difficulty.toUpperCase()}</span>` : '';
                 historyHTML += `
                     <div class="history-item">
-                        <span class="history-date">${game.date}</span>
+                        <span class="history-date">${game.date} ${diffBadge}</span>
                         <span class="history-score">Score: ${game.score}</span>
-                        <span class="history-accuracy">Accuracy: ${game.accuracy}%</span>
+                        <span class="history-accuracy">Acc: ${game.accuracy}%</span>
                     </div>
                 `;
             });
@@ -442,6 +497,13 @@
         <div id="controls">
             <span class = "score" title ="Your score">0 pts</span>
             <button type="button" id="start_button" title = "Click to start">Start!</button>
+        </div>
+        
+        <div id="difficulty-selector">
+            <span>Difficulty:</span>
+            <button class="difficulty-btn" id="easyBtn" onclick="setDifficulty('easy')">Easy</button>
+            <button class="difficulty-btn active" id="mediumBtn" onclick="setDifficulty('medium')">Medium</button>
+            <button class="difficulty-btn" id="hardBtn" onclick="setDifficulty('hard')">Hard</button>
         </div>
        
         <div class="timer" title="Seconds remaining">

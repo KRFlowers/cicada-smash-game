@@ -99,6 +99,38 @@ audio {
 	padding: 10px;
 	font-size: 12px;		
 	}
+	
+#difficulty-selector {
+	text-align: right;
+	padding: 10px 0;
+	font-weight: bold;
+	color: yellow;
+}
+
+.difficulty-btn {
+	margin-left: 5px;
+	padding: 8px 15px;
+	font-size: 14px;
+	font-weight: bold;
+	color: white;
+	background-color: rgba(34, 139, 34, 0.7);
+	border: 2px solid #228B22;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.3s;
+}
+
+.difficulty-btn:hover {
+	background-color: rgba(34, 139, 34, 0.9);
+	transform: scale(1.05);
+}
+
+.difficulty-btn.active {
+	background-color: #228B22;
+	border-color: yellow;
+	box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
 #soundOff {
 	width: 40px;
 	height: 30px;
