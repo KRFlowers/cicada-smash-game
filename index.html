@@ -56,7 +56,6 @@
     
     <script type="text/javascript" src="Auz-Bug-8eac7b7/bug-min.js"></script> 
     <script>
-        var userName = "";
         var userScore = 0;
         var gameClock;
         var addClock;
@@ -65,10 +64,7 @@
         var imageArray = [];
 
         $(document).ready(
-            function(){	
-                //  userName = prompt("Enter your first name:", " ");
-                // document.getElementById("gamespace").style.cursor = url("img/fly-swatter.png");
-               // $(".namePrompt").html("Hello " + userName + ", are you ready to play the game? ");
+            function(){
                 $(".timer").show();
                 new BugController({'minBugs':100, 'maxBugs':300});
 
@@ -110,14 +106,14 @@
         }
        
         function startGame(){
-            // When user presses start, Initialize all gamespace elements and start game
-            secRemaining = 30;                              //set timer to 30 sec
+            // When user presses start, initialize all gamespace elements and start game
+            var secRemaining = 30;
             userScore = 0;
-            window.location = "#gamespace";                 // jump to gamespace
-            var imageCount = 0;                             // set imageCount to zero
-            imageArray = [];                                //Clear image array
-            $('#playSounds')[0].play();                     // Play sounds
-            $("#start_button").off("click");                //turn off ability to click start button
+            window.location = "#gamespace";
+            var imageCount = 0;
+            imageArray = [];
+            $('#playSounds')[0].play();
+            $("#start_button").off("click");
             $(".timer").html(secRemaining + " sec left");
             $(".score").html(userScore + " pts"); 
             $("#gamespace img").remove();                   //remove any previous gamespace images
