@@ -197,7 +197,7 @@
     <script>
         var userScore = 0;
         var gameClock;
-        var addClock;
+        var spawnClock; // Interval for spawning cicadas
         var hideClock;
         var imageCount = 0;
         var imageArray = [];
@@ -321,15 +321,28 @@
                 }
             });
 
+            // Start spawning cicadas at regular intervals
+            spawnClock = setInterval(function() {
+                if (cicadasSpawnedThisGame < maxCicadas) {
+                    addImage();
+                }
+            }, spawnRate);
+            
+            // Start hiding cicadas at random intervals
+            hideClock = setInterval(function() {
+                hideImage();
+            }, 1500);
+            
             updateTimer();                                  //start the timer
               }  
             
         function updateTimer(){                
             if (secRemaining < 0) {
-                // When time runs out, do the following steps to reset game parameters
+                // When time runs out, stop everything
                 $('#playSounds')[0].pause();               //Pause sound
                 $('#playSounds')[0].currentTime =  0;      //set sound back to beginning
-                clearTimeout(addClock);                    // Stop image append clock
+                clearInterval(spawnClock);                 // Stop spawning cicadas
+                clearInterval(hideClock);                  // Stop hiding cicadas
                 clearTimeout(gameClock);                   // Stop game clock    
                 $(".score").html(userScore + " pts");
                 
@@ -344,29 +357,14 @@
                 });
             }  
             else{ 
-                //While time is remaining, do the following to play the game
-                
-                // Calculate how aggressively to spawn based on remaining cicadas
-                var remainingCicadas = maxCicadas - cicadasSpawnedThisGame;
-                var spawnInterval = remainingCicadas > 0 ? Math.min(spawnRate, (secRemaining * 1000) / remainingCicadas) : spawnRate;
-                
-                addClock = Math.floor(Math.random() * spawnInterval);
-                hideClock = randomNumberImage();
-                addClock = setTimeout("addImage()", addClock);      //add image at calculated interval
-                hideClock = setTimeout("hideImage()", hideClock);   //hide images at random interval
-                $(".timer").html(secRemaining + " sec left");       //display seconds left            
+                // Just update the timer display
+                $(".timer").html(secRemaining + " sec left");
                 secRemaining -= 1;  
                 gameClock = setTimeout("updateTimer()", 1000);
-               
                  }                    
             }
         function addImage(){
             // Add image to page, each image will have a unique ID provided by the imageCount variable
-            // Only spawn if we haven't reached maxCicadas
-            if (cicadasSpawnedThisGame >= maxCicadas) {
-                return; // Stop spawning once we've reached the max
-            }
-            
             var xPos = randomNumberx();
             var yPos = randomNumbery(); 
             var imageID = imageCount + "image";
