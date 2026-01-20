@@ -1,58 +1,57 @@
-# Cicada Smash Game 🦗
+# Fourier's Forest
+**Find the Signal in the Noise**
 
-A fun, interactive browser game where you race against the clock to smash as many cicadas as possible! Built with vanilla JavaScript and jQuery, **featuring comprehensive performance analytics and data tracking.**
+Fourier's Forest is a statistics quiz game with a forest theme background built in JavaScript. It was originally created as a class project and later extended to add data science quiz elements. Give it a try and test your knowledge!
 
-## About
-
-This game was inspired by those summers when cicadas are everywhere. The goal is simple: click on as many cicadas as you can in 30 seconds. They appear and disappear randomly, so you've got to be quick!
-
-**What makes this different:** Built-in analytics dashboard that tracks your performance metrics, making it both a game AND a data analysis project.
-
-## Features
-
-### Gameplay
-- **Timed gameplay** - 30 second rounds
-- **Random cicada spawning** - bugs appear and disappear at random intervals
-- **Background animations** - animated cicadas fly around the screen using the Bug library
-- **Ambient sound effects** - cicada sounds that you can toggle on/off
-
-### Analytics & Data Tracking
-- **📊 Real-time performance metrics** - Track clicks, accuracy, and reaction times
-- **📈 Statistical analysis** - View detailed stats after each game:
-  - Click accuracy percentage
-  - Catch rate (cicadas caught vs spawned)
-  - Average reaction time
-  - Missed clicks tracking
-- **📉 Performance history** - Stores your last 10 games in browser localStorage
-- **🎯 Progress tracking** - See your improvement over time
+**JavaScript concepts practiced:**
+- DOM manipulation and event handling
+- CSS Grid layout for responsive card positioning
+- jQuery for dynamic content generation
+- localStorage API for persistent game history
+- Timer functions and game state management
+- Click tracking and performance analytics
+- Modal dialogs and UI interactions
 
 ## How to Play
 
 1. Open `index.html` in your browser
-2. Click the "Start!" button when ready
-3. Click on cicadas as they appear to score points
-4. Watch the timer - you have 30 seconds!
-5. Review your performance statistics when the game ends
-6. Track your progress across multiple sessions
+2. Select a difficulty level (Easy, Medium, or Hard)
+3. Click "Start" - a grid of statistical concepts appears
+4. Click only on valid concepts to score points
+5. Avoid invalid concepts (they subtract points)
+6. Win by finding more signal than noise before time runs out
 
-## Tech Stack
+## Features
 
-- **HTML5/CSS3** - structure and styling
-- **JavaScript** - game logic and statistical calculations
-- **jQuery** - DOM manipulation and event handling
-- **jQuery UI** - tooltips
-- **localStorage API** - persistent game history tracking
-- **Bug Library by Auz** - animated flying cicadas in the background
+- Three difficulty levels with varying grid sizes and time limits
+- Scoring system: +1 for correct, -1 for incorrect
+- End-game statistics (accuracy, identification rate, reaction time)
+- Game history saved in browser (last 10 games)
+- Forest-themed visual design with animated background
+- Info modal about Joseph Fourier
+
+## Tech Used
+
+- HTML5/CSS3 with CSS Grid
+- JavaScript and jQuery
+- localStorage for game history
+- Bug animation library by Auz
+
+## Notes
+
+Desktop only - mobile support not implemented.
+
+Questions can be edited in `data/questions.js`.
 
 ## Credits
 
-- **Bug animation library** by [Auz](https://github.com/Auz/Bug) - creates the awesome flying cicada animations
-- **Forest background** by Gustavo Rezende from [Pixabay](https://pixabay.com)
-- **Cicada sound effect** from [Notification Sounds](https://notification-sounds.com/584-cicada-sound-effect.html)
+- Bug animation library by [Auz](https://github.com/Auz/Bug)
+- Forest background from Pixabay
+- Cicada sound effect from Notification Sounds
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License
 
 ---
 

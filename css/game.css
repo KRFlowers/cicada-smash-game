@@ -1,5 +1,8 @@
-/* CSS Document */
+/* FOURIER'S FOREST - GAME STYLES
+   Statistical concepts game with forest theme
+   Created by Kristi Loesch */
 
+/* BASE LAYOUT AND BACKGROUND */
 html, body {
 	height: 100%;
 	margin: 0;
@@ -11,126 +14,299 @@ html, body {
 	background-position: center center;
 	background-attachment: fixed;
 	background-size: cover;
-	font-family:  open-sans, sans-serif;
+	font-family: open-sans, sans-serif;
 	font-size: 18px;
 	color: white;
-	}
-	
-h1 {color:white;
-	margin: 2px;
-    padding: 10px;
-	text-shadow: 2px 2px black, -2px -2px black, 2px 4px rgb(35, 35, 28);
-	font-size: 44px;
-    }
-	
-
-div#content {
-    width: 700px;
-    margin:0 auto;
-	 }
-	
-div#controls {
-	text-align: right;
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 15px;
 }
-	
-div#controls span {
-	font-weight: bold;
-    font-size: 18px;
-	color: yellow;
-	padding-right:20px;
-    }
-			
+
+/* MAIN CONTENT CONTAINER */
 div#content {
 	width: 700px;
-	margin:0 auto;
+	margin: 0 auto;
 	padding: 20px;
-		 }
-
-
-.timer {
-    font-weight: bold;
-    font-size: 18px;
-	color: yellow;
-    display:none;   
 }
 
-p {color:white;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+/* TITLE AND HEADER SECTION */
+h1 {
+	color: white;
+	margin: 2px;
+	padding: 10px;
+	text-shadow: 2px 2px black, -2px -2px black, 2px 4px rgb(35, 35, 28);
+	font-size: 44px;
+}
+
+.title-section {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.tagline {
+	color: #ffd700;
+	font-style: italic;
+	margin: -5px 0 0 0;
+	font-size: 16px;
+}
+
+/* Info icon - opens modal about Joseph Fourier */
+.info-icon {
+	font-size: 22px;
+	color: #ffd700;
+	cursor: pointer;
+	opacity: 0.7;
+	transition: opacity 0.2s;
+	margin-left: 8px;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.info-icon:hover {
+	opacity: 1;
+}
+
+/* GENERAL TEXT STYLING */
+p {
+	color: white;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	line-height: 30px;
 }
 
+/* UNIFIED CONTROL PANEL */
+/* Contains instructions, difficulty selector, and game controls */
+#control-panel {
+	background: rgba(0, 0, 0, 0.75);
+	border: 1px solid rgba(139, 90, 43, 0.5);
+	border-radius: 8px;
+	padding: 20px 25px;
+	margin: 0 auto 20px;
+	max-width: 600px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Instructions text with highlighted signal/noise terms */
+.instructions-text {
+	color: #e0e0e0;
+	margin: 0 0 20px 0;
+	font-size: 15px;
+	line-height: 1.8;
+	text-align: center;
+}
+
+.instructions-text strong {
+	font-size: 17px;
+	display: block;
+	margin-bottom: 5px;
+}
+
+.instructions-text .highlight {
+	color: #ffd700;
+	font-weight: 600;
+}
+
+/* GAME CONTROLS LAYOUT */
+.game-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 15px;
+}
+
+/* DIFFICULTY SELECTOR */
+.difficulty-section {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.control-label {
+	color: #b0b0b0;
+	font-size: 14px;
+}
+
+/* Minimal text-based difficulty links */
+.difficulty-link {
+	color: #d0d0d0;
+	font-size: 14px;
+	cursor: pointer;
+	padding: 4px 8px;
+	transition: color 0.2s;
+	border-bottom: 2px solid transparent;
+}
+
+.difficulty-link:hover {
+	color: #ffffff;
+}
+
+.difficulty-link.active {
+	color: #ffd700;
+	border-bottom-color: #ffd700;
+	font-weight: 600;
+}
+
+/* SCORE, TIMER, AND START BUTTON */
+.game-info {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.score, .timer {
+	color: #ffd700;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.timer {
+	font-weight: bold;
+	font-size: 18px;
+	color: yellow;
+	display: none; /* Hidden until game starts */
+}
+
+#start_button {
+	padding: 9px 22px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #2d2d2d;
+	background-color: #e6c200;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.2s;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	line-height: 1;
+	vertical-align: middle;
+}
+
+#start_button:hover {
+	background-color: #ffd700;
+	transform: translateY(-1px);
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* GAME BOARD */
+/* Grid layout for statistical concept cards */
 div#gamespace {
 	position: relative;
 	margin: 10px;
-	padding: 10px;
-	height: 350px;
-	background-color: rgba(255, 255, 255, .1);
-	border: 1px solid white;  
-	cursor: url("../img/leaf.png"), default;
+	padding: 12px;
+	height: auto;
+	min-height: 450px;
+	background: linear-gradient(135deg, rgba(34, 139, 34, 0.15) 0%, rgba(19, 79, 21, 0.25) 100%);
+	border: 2px solid rgba(139, 90, 43, 0.6);
+	cursor: pointer;
+	border-radius: 8px;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+	align-content: start;
 }
 
+/* Flying bugs positioned absolutely over game board */
 div#gamespace img { 
 	position: absolute;
 } 
 
 .gameimage {
-    width: 120px;
+	width: 120px;
 }
 
-div#content {
-    width: 700px;
-    margin:0 auto;
-	padding: 20px;
-	 }
-	 #gameOverDialog {
-		font-size: 24px;             /* Larger text for better readability */
-		background-color: #f8f8f8;  /* Light neutral background */
-		border: 1px solid #e0e0e0;  /* Subtle border */
-		padding: 30px;              /* Adequate padding inside the dialog */
-		border-radius: 10px;        /* Rounded corners */
-		width: 300px;               /* Fixed width for consistency */
-		text-align: center;         /* Centered text */
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Optional drop shadow */
+/* STATISTICAL CONCEPT CARDS */
+/* Cards contain valid or invalid statistical statements */
+.concept-card {
+	padding: 10px 8px;
+	background: linear-gradient(135deg, rgba(101, 67, 33, 0.85) 0%, rgba(72, 48, 24, 0.9) 100%);
+	color: #f4f1de;
+	border-radius: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+	transition: all 0.2s ease;
+	text-align: center;
+	border: 2px solid rgba(139, 90, 43, 0.7);
+	animation: fadeIn 0.4s ease-in;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 65px;
+	line-height: 1.2;
+}
+
+/* Valid and invalid cards look identical - no visual clues */
+.concept-card.valid,
+.concept-card.invalid {
+	background: linear-gradient(135deg, rgba(101, 67, 33, 0.85) 0%, rgba(72, 48, 24, 0.9) 100%);
+	border-color: rgba(139, 90, 43, 0.7);
+	color: #f4f1de;
+}
+
+.concept-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+	border-color: rgba(180, 120, 60, 0.9);
+}
+
+/* Correct click - shows green */
+.concept-card.clicked {
+	background: linear-gradient(135deg, rgba(34, 139, 34, 0.9) 0%, rgba(19, 100, 21, 0.95) 100%);
+	color: white;
+	border-color: #4CAF50;
+	box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+	animation: successPulse 0.3s ease-out;
+}
+
+/* Wrong click - shows red */
+.concept-card.wrong-click {
+	background: linear-gradient(135deg, rgba(139, 34, 34, 0.9) 0%, rgba(100, 19, 19, 0.95) 100%);
+	color: white;
+	border-color: #d32f2f;
+	animation: shake 0.3s ease-in-out;
+	box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
 	}
-	
-	
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes successPulse {
+	0% { transform: scale(1); }
+	50% { transform: scale(1.05); }
+	100% { transform: scale(1); }
+}
+
+@keyframes shake {
+	0%, 100% { transform: translateX(0); }
+	25% { transform: translateX(-4px); }
+	75% { transform: translateX(4px); }
+}
+
+/* GAME OVER MODAL */
+#gameOverDialog {
+	font-size: 24px;
+	background-color: #f8f8f8;
+	border: 1px solid #e0e0e0;
+	padding: 30px;
+	border-radius: 10px;
+	width: 300px;
+	text-align: center;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* AUDIO CONTROLS */
 audio {
-    width: 100px;
-    height: 24px;
+	width: 100px;
+	height: 24px;
 	padding: 10px;
 	font-size: 12px;		
-	}
-	
-#difficulty-selector {
-	display: inline-flex;
-	gap: 5px;
-}
-
-.difficulty-btn {
-	padding: 8px 15px;
-	font-size: 14px;
-	font-weight: bold;
-	color: white;
-	background-color: rgba(34, 139, 34, 0.7);
-	border: 2px solid #228B22;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: all 0.3s;
-}
-
-.difficulty-btn:hover {
-	background-color: rgba(34, 139, 34, 0.9);
-	transform: scale(1.05);
-}
-
-.difficulty-btn.active {
-	background-color: #228B22;
-	border-color: yellow;
-	box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
 }
 
 #soundOff {

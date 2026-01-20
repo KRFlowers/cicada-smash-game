@@ -1,11 +1,10 @@
 <!-- 
-    Cicada Smash Game
+    Fourier's Forest: Find the Signal in the Noise
     Created by Kristi Loesch
     
-    Credits:
-    - Forest image by Gustavo Rezende from Pixabay
-    - Cicada sound effect from https://notification-sounds.com/584-cicada-sound-effect.html
-    - Bug animation library by Auz (https://github.com/Auz/Bug)
+    A data science game where you extract signal from noise
+    Background bugs = noise, Valid concepts = signal, Invalid = bugs in analysis
+    Demonstrates JavaScript, CSS Grid, statistical knowledge, and real-time analytics
 -->
 
 <!DOCTYPE html>
@@ -13,7 +12,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cicada Smash Game</title>
+    <title>Fourier's Forest - Find the Signal in the Noise</title>
     
 	<link href="css/game.css" rel="stylesheet" />
 
@@ -22,7 +21,7 @@
 <style>
 .custom-modal {
     display: none;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     width: 100%;
@@ -32,7 +31,7 @@
 }
 
 .modal-content {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -59,6 +58,23 @@
     margin-top: 15px;
     margin-bottom: 8px;
     font-size: 16px;
+}
+
+.info-modal {
+    max-width: 500px;
+    text-align: left;
+}
+
+.info-modal h2 {
+    text-align: center;
+    color: #228B22;
+    margin-bottom: 15px;
+}
+
+.info-modal p {
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 12px;
 }
 
 .stats-grid {
@@ -192,20 +208,21 @@
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
     <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
-    
+    <script type="text/javascript" src="data/questions.js"></script>
     <script type="text/javascript" src="Auz-Bug-8eac7b7/bug-min.js"></script> 
     <script>
+        /* ==================================================
+           GAME LOGIC - FOURIER'S FOREST
+           Statistical concepts quiz game
+           ================================================== */
+        
+        // Game state variables
         var userScore = 0;
         var gameClock;
-        var spawnClock; // Interval for spawning cicadas
-        var hideClock;
-        var imageCount = 0;
-        var imageArray = [];
+        var conceptsDisplayed = [];
         var secRemaining = 30;
         var currentDifficulty = 'medium';
-        var spawnRate = 600;
-        var maxCicadas = 40;
-        var cicadasSpawnedThisGame = 0;
+        var totalConceptsToDisplay = 20;
         
         // Statistical tracking variables
         var totalClicks = 0;
@@ -213,8 +230,17 @@
         var missedClicks = 0;
         var clickTimes = [];
         var gameStartTime = 0;
-        var cicadasSpawned = 0;
-        var cicadasMissed = 0;
+        var validConceptsTotal = 0;
+        var validConceptsClicked = 0;
+        
+        // ===== QUESTIONS LOADED FROM data/questions.js =====
+        // Edit data/questions.js file to modify game questions
+        // Valid concepts - these are CORRECT statements
+        var validConcepts = questionsData.validConcepts;
+        
+        // Invalid concepts - these are INCORRECT statements (bugs in analysis)
+        var invalidConcepts = questionsData.invalidConcepts;
+        // ===== END EXTERNAL DATA SECTION =====
 
         $(document).ready(
             function(){
@@ -241,30 +267,34 @@
 
             });
 
+        // Sets game difficulty level and adjusts grid size and time limit
+        // Parameters: level ('easy', 'medium', or 'hard')
         function setDifficulty(level) {
             currentDifficulty = level;
             switch(level) {
                 case 'easy':
-                    spawnRate = 1000;
-                    maxCicadas = 30;
+                    totalConceptsToDisplay = 16; // 4x4 grid
+                    secRemaining = 45;
                     break;
                 case 'medium':
-                    spawnRate = 750;
-                    maxCicadas = 40;
+                    totalConceptsToDisplay = 20; // 4x5 grid
+                    secRemaining = 35;
                     break;
                 case 'hard':
-                    spawnRate = 500;
-                    maxCicadas = 60;
+                    totalConceptsToDisplay = 24; // 4x6 grid
+                    secRemaining = 30;
                     break;
             }
-            $('.difficulty-btn').removeClass('active');
+            $('.difficulty-link').removeClass('active');
             $('#' + level + 'Btn').addClass('active');
         }
 
+        // Generates random x-coordinate for flying bug positioning
         function randomNumberx(){
             return Math.floor((Math.random()*543));     
         }           
      
+        // Generates random y-coordinate for flying bug positioning
         function randomNumbery(){
             return Math.floor((Math.random()*280));
         }
@@ -273,127 +303,153 @@
             return Math.floor((Math.random()*spawnRate));
         }
 
-        function updateScore(){
-            userScore += 1;
-            successfulClicks++;
-            var clickTime = Date.now() - gameStartTime;
-            clickTimes.push(clickTime);
-            $(".score").html(userScore + " pts");            
-        }
+
        
         function startGame(){
-            // When user presses start, initialize all gamespace elements and start game
-            secRemaining = 30;
-            userScore = 0;
-            cicadasSpawnedThisGame = 0;
+            // Reset difficulty-based time
+            setDifficulty(currentDifficulty);
             
             // Reset statistics
+            userScore = 0;
             totalClicks = 0;
             successfulClicks = 0;
             missedClicks = 0;
             clickTimes = [];
-            cicadasSpawned = 0;
-            cicadasMissed = 0;
+            validConceptsTotal = 0;
+            validConceptsClicked = 0;
             gameStartTime = Date.now();
             
             window.location = "#gamespace";
-            imageCount = 0;
-            imageArray = [];
             $('#playSounds')[0].play();
             $("#start_button").off("click");
-            $(".timer").html(secRemaining + " sec left");
-            $(".score").html(userScore + " pts"); 
-            $("#gamespace img").remove();                   //remove any previous gamespace images
+            $(".timer").html("Time: " + secRemaining + "s");
+            $(".timer").show(); // Make sure timer is visible
+            $(".score").html("Score: " + userScore); 
+            $("#gamespace .concept-card").remove();
+            $("#gamespace #gameGoal").remove(); // Remove previous goal indicator
+            $("#gamespace").off("click"); // Clear previous handlers
             
-            // Track clicks on cicadas
-            $("#gamespace").on("click", "img",
+            // Create grid of concepts
+            displayAllConcepts();
+            
+            // Track clicks on VALID concepts (correct answer = +1 point)
+            $("#gamespace").on("click", ".concept-card.valid",
                     function() {
+                        if ($(this).hasClass('clicked') || $(this).hasClass('wrong-click')) return;
                         totalClicks++;
-                        updateScore();
-                        $(this).remove();
+                        validConceptsClicked++;
+                        userScore++; // Each correct click = 1 point
+                        $(".score").html("Score: " + userScore);
+                        $(this).addClass('clicked');
+                        var clickTime = Date.now() - gameStartTime;
+                        clickTimes.push(clickTime);
                     });
             
-            // Track missed clicks (clicking on empty space)
-            $("#gamespace").on("click", function(e) {
-                if (e.target.id === "gamespace") {
-                    totalClicks++;
-                    missedClicks++;
-                }
-            });
-
-            // Start spawning cicadas at regular intervals
-            spawnClock = setInterval(function() {
-                if (cicadasSpawnedThisGame < maxCicadas) {
-                    addImage();
-                }
-            }, spawnRate);
+            // Track clicks on INVALID concepts (PENALTY: -1 point)
+            $("#gamespace").on("click", ".concept-card.invalid",
+                    function() {
+                        if ($(this).hasClass('clicked') || $(this).hasClass('wrong-click')) return;
+                        totalClicks++;
+                        missedClicks++;
+                        userScore--; // PENALTY: lose 1 point for clicking invalid
+                        if (userScore < 0) userScore = 0; // Don't go below 0
+                        $(".score").html("Score: " + userScore);
+                        $(this).addClass('wrong-click');
+                    });
             
-            // Start hiding cicadas at random intervals
-            hideClock = setInterval(function() {
-                hideImage();
-            }, 1500);
-            
-            updateTimer();                                  //start the timer
-              }  
-            
+            updateTimer();
+        }  
+        
+        // Updates countdown timer every second
+        // Ends game when timer reaches zero
         function updateTimer(){                
             if (secRemaining < 0) {
+                console.log('Game Over - Final Score:', userScore);
+                
                 // When time runs out, stop everything
-                $('#playSounds')[0].pause();               //Pause sound
-                $('#playSounds')[0].currentTime =  0;      //set sound back to beginning
-                clearInterval(spawnClock);                 // Stop spawning cicadas
-                clearInterval(hideClock);                  // Stop hiding cicadas
-                clearTimeout(gameClock);                   // Stop game clock    
-                $(".score").html(userScore + " pts");
+                $('#playSounds')[0].pause();
+                $('#playSounds')[0].currentTime = 0;
+                clearTimeout(gameClock);
+                
+                // Update score displays
+                $(".score").html("Score: " + userScore);
                 
                 // Calculate and display statistics
                 displayGameStats();
-                $("#gameOverDialog").show();
                 
-                $("#gamespace").off("click");              // Turn off gamespace click
+                // Show modal
+                $("#gameOverDialog").css('display', 'block');
+                console.log('Modal should be visible now');
+                
+                $("#gamespace").off("click");
                 $("#start_button").on("click",
                     function () {
                         startGame();
                 });
             }  
             else{ 
-                // Just update the timer display
-                $(".timer").html(secRemaining + " sec left");
+                $(".timer").html("Time: " + secRemaining + "s");
                 secRemaining -= 1;  
                 gameClock = setTimeout("updateTimer()", 1000);
-                 }                    
-            }
-        function addImage(){
-            // Add image to page, each image will have a unique ID provided by the imageCount variable
-            var xPos = randomNumberx();
-            var yPos = randomNumbery(); 
-            var imageID = imageCount + "image";
-            $("#gamespace").append(`<img class="gameimage" id="${imageID}" src="img/gameimage.png" style="left: ${xPos}px; top: ${yPos}px;"/>`);
-            setTimeout(`updateArray("${imageID}")`, 1000);          // update image array with new image after it has been on the screen for 1 sec
-            cicadasSpawned++;
-            cicadasSpawnedThisGame++; // Track cicadas spawned THIS game
-            imageCount++; 
-            }  
-
-        function updateArray(imageID){
-            // keep track of images currently on the screen with an array
-            imageArray.push(imageID);    
-        }
-
-        function hideImage(){
-            // Hide images at a random after a random interval
-            var randomIndex = Math.floor(Math.random() * imageArray.length);  
-            var hideImage = imageArray[randomIndex];
-            imageArray.splice(randomIndex, 1);  
-            $(`#${hideImage}`).hide();
-            cicadasMissed++;
+            }                    
         }
         
+        // Creates and displays a mix of valid and invalid concept cards on the game board
+        // 60% valid concepts (signal), 40% invalid concepts (noise)
+        function displayAllConcepts() {
+            // Create a mix of valid and invalid concepts (60% valid, 40% invalid)
+            var numValid = Math.floor(totalConceptsToDisplay * 0.6);
+            var numInvalid = totalConceptsToDisplay - numValid;
+            
+            var selectedConcepts = [];
+            
+            // Select random valid concepts
+            var shuffledValid = validConcepts.sort(() => 0.5 - Math.random());
+            for (var i = 0; i < numValid; i++) {
+                selectedConcepts.push({ text: shuffledValid[i], type: 'valid' });
+            }
+            
+            // Select random invalid concepts
+            var shuffledInvalid = invalidConcepts.sort(() => 0.5 - Math.random());
+            for (var i = 0; i < numInvalid; i++) {
+                selectedConcepts.push({ text: shuffledInvalid[i], type: 'invalid' });
+            }
+            
+            // Shuffle all concepts together
+            selectedConcepts.sort(() => 0.5 - Math.random());
+            validConceptsTotal = numValid;
+            
+            // Add helpful header showing target
+            $("#gamespace").prepend(
+                `<div id="gameGoal" style="grid-column: 1 / -1; background: rgba(34, 139, 34, 0.2); padding: 8px; border: 2px solid rgba(139, 90, 43, 0.8); border-radius: 6px; text-align: center; font-weight: 600; color: #f4f1de; font-size: 13px; margin-bottom: 8px;">
+                    Find ${numValid} signal concepts | Avoid ${numInvalid} bugs in analysis | Perfect Score = ${numValid}
+                </div>`
+            );
+            
+            // Display in grid
+            selectedConcepts.forEach(function(concept, index) {
+                var conceptID = "concept" + index;
+                $("#gamespace").append(
+                    `<div class="concept-card ${concept.type}" id="${conceptID}">${concept.text}</div>`
+                );
+            });
+        }
+
+        // Calculates and displays game statistics in the end-game modal
+        // Shows accuracy, identification rate, and average reaction time
         function displayGameStats() {
+            console.log('displayGameStats called - Score:', userScore, 'Valid Total:', validConceptsTotal);
+            
+            // Set final score in modal
+            $('#finalScore').text(userScore);
+            $('#totalValid').text(validConceptsTotal);
+            
             // Calculate statistics
-            var accuracy = totalClicks > 0 ? ((successfulClicks / totalClicks) * 100).toFixed(1) : 0;
-            var catchRate = cicadasSpawned > 0 ? ((successfulClicks / cicadasSpawned) * 100).toFixed(1) : 0;
+            var accuracy = totalClicks > 0 ? ((validConceptsClicked / totalClicks) * 100).toFixed(1) : 0;
+            var identificationRate = validConceptsTotal > 0 ? ((validConceptsClicked / validConceptsTotal) * 100).toFixed(1) : 0;
             var avgReactionTime = clickTimes.length > 0 ? (clickTimes.reduce((a, b) => a + b, 0) / clickTimes.length / 1000).toFixed(2) : 0;
+            
+            console.log('Stats calculated - Accuracy:', accuracy, 'ID Rate:', identificationRate);
             
             // Build stats HTML
             var statsHTML = `
@@ -412,19 +468,19 @@
                         <span class="stat-value">${accuracy}%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Cicadas Caught:</span>
-                        <span class="stat-value">${successfulClicks} / ${cicadasSpawned}</span>
+                        <span class="stat-label">Valid Concepts Found:</span>
+                        <span class="stat-value">${validConceptsClicked} / ${validConceptsTotal}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Catch Rate:</span>
-                        <span class="stat-value">${catchRate}%</span>
+                        <span class="stat-label">Identification Rate:</span>
+                        <span class="stat-value">${identificationRate}%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Missed Clicks:</span>
+                        <span class="stat-label">Wrong Clicks:</span>
                         <span class="stat-value">${missedClicks}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Avg Reaction Time:</span>
+                        <span class="stat-label">Avg Click Time:</span>
                         <span class="stat-value">${avgReactionTime}s</span>
                     </div>
                 </div>
@@ -436,7 +492,7 @@
                 score: userScore,
                 difficulty: currentDifficulty,
                 accuracy: accuracy,
-                catchRate: catchRate,
+                identificationRate: identificationRate,
                 avgReactionTime: avgReactionTime
             });
             
@@ -445,18 +501,22 @@
             displayGameHistory();
         }
         
+        // Saves game results to local storage
+        // Keeps only the last 10 games for history tracking
         function saveGameHistory(gameData) {
-            var history = JSON.parse(localStorage.getItem('cicadaGameHistory') || '[]');
+            var history = JSON.parse(localStorage.getItem('statGameHistory') || '[]');
             history.push(gameData);
             // Keep only last 10 games
             if (history.length > 10) {
                 history = history.slice(-10);
             }
-            localStorage.setItem('cicadaGameHistory', JSON.stringify(history));
+            localStorage.setItem('statGameHistory', JSON.stringify(history));
         }
         
+        // Displays recent game history from local storage
+        // Shows date, difficulty, score, and accuracy for each game
         function displayGameHistory() {
-            var history = JSON.parse(localStorage.getItem('cicadaGameHistory') || '[]');
+            var history = JSON.parse(localStorage.getItem('statGameHistory') || '[]');
             if (history.length === 0) {
                 $("#gameHistory").html('<p>No previous games yet. Play more to track your progress!</p>');
                 return;
@@ -479,25 +539,36 @@
 
         // Modal handlers
         $(document).ready(function() {
+            // Info icon click
+            $('#infoIcon').click(function(e) {
+                e.stopPropagation();
+                $('#fourierInfoDialog').show();
+            });
+            
+            // Close Fourier info
+            $('#closeFourierInfo').click(function() {
+                $('#fourierInfoDialog').hide();
+            });
+            
+            // Game over modal handlers
             $(document).on('click', '#playAgainBtn', function() {
+                console.log('Play Again clicked');
                 $('#gameOverDialog').hide();
                 startGame();
             });
             
             $(document).on('click', '#exitBtn', function() {
+                console.log('Exit clicked');
                 $('#gameOverDialog').hide();
-                // Clear the gamespace and reset to initial state
-                $("#gamespace img").remove();
-                userScore = 0;
-                secRemaining = 30;
-                $(".score").html("0 pts");
-                $(".timer").html("30 sec left");
-                window.location = "#content"; // Scroll back to top
             });
             
+            // Click outside modal to close
             $(window).click(function(event) {
                 if ($(event.target).is('#gameOverDialog')) {
                     $('#gameOverDialog').hide();
+                }
+                if ($(event.target).is('#fourierInfoDialog')) {
+                    $('#fourierInfoDialog').hide();
                 }
             });
         });
@@ -509,23 +580,31 @@
    
 	<div id="content">
 
-        <h1>Cicada Smash!</h1>
-	    <div id="instructions"  >
-             <p > The cicadas are swarming! After clicking "start", you will have 30 seconds to click and destroy as many as you can. The images appear randomly so be ready!</p>
+        <div class="title-section">
+            <h1>Fourier's Forest <span id="infoIcon" class="info-icon" title="About Joseph Fourier">ⓘ</span></h1>
+            <p class="tagline">Find the Signal in the Noise</p>
         </div>
-                     
-        <div id="controls">
-            <span class = "score" title ="Your score">0 pts</span>
-            <div id="difficulty-selector">
-                <button class="difficulty-btn" id="easyBtn" onclick="setDifficulty('easy')">Easy (30)</button>
-                <button class="difficulty-btn active" id="mediumBtn" onclick="setDifficulty('medium')">Medium (40)</button>
-                <button class="difficulty-btn" id="hardBtn" onclick="setDifficulty('hard')">Hard (60)</button>
+	    
+        <div id="control-panel">
+            <p class="instructions-text">
+                <strong>Test your stats knowledge!</strong><br>
+                Click valid concepts (<span class="highlight">signal</span>). Avoid errors (<span class="highlight">noise</span>). &nbsp; +1 correct | -1 incorrect
+            </p>
+            
+            <div class="game-controls">
+                <div class="difficulty-section">
+                    <span class="control-label">Difficulty:</span>
+                    <span class="difficulty-link" id="easyBtn" onclick="setDifficulty('easy')">Easy</span>
+                    <span class="difficulty-link active" id="mediumBtn" onclick="setDifficulty('medium')">Medium</span>
+                    <span class="difficulty-link" id="hardBtn" onclick="setDifficulty('hard')">Hard</span>
+                </div>
+                
+                <div class="game-info">
+                    <span class="score" title="Your score">Score: 0</span>
+                    <span class="timer" title="Seconds remaining">Time: 35s</span>
+                    <button type="button" id="start_button" title="Click to start">Start</button>
+                </div>
             </div>
-            <button type="button" id="start_button" title = "Click to start">Start!</button>
-        </div>
-       
-        <div class="timer" title="Seconds remaining">
-            30 sec left
         </div>
     	
         <div id="gamespace">
@@ -533,7 +612,7 @@
             <div id="gameOverDialog" class="custom-modal">
                 <div class="modal-content">
                     <h2>Game Over!</h2>
-                    <p>You scored <span class="score">0 pts</span></p>
+                    <p style="font-size: 24px; font-weight: bold; color: #228B22; margin: 15px 0;">Score: <span id="finalScore">0</span> / <span id="totalValid">0</span></p>
                     
                     <div id="gameStats"></div>
                     
@@ -543,10 +622,20 @@
                     <button class="exit-button" id="exitBtn">Exit</button>
                 </div>
             </div>
+            
+            <!-- Fourier Info Modal -->
+            <div id="fourierInfoDialog" class="custom-modal">
+                <div class="modal-content info-modal">
+                    <h2>Joseph Fourier (1768-1830)</h2>
+                    <p>French mathematician who showed that complex signals can be broken down into simple waves - a concept now known as Fourier analysis. This idea is foundational in statistics because it helps separate meaningful patterns (signal) from random variation (noise). Fourier methods are used in time-series analysis, image processing, and detecting hidden trends in data.</p>
+                    
+                    <button class="close-button" id="closeFourierInfo">Close</button>
+                </div>
+            </div>
 		</div>
 
         <div id="sound">
-            To turn off cicada sound, click below after game starts. <br>
+            To turn off background sound, click below after game starts. <br>
             <audio id="playSounds" autoplay controls>
                 <source src="audio/163688__cognito-perceptu__cicadas.wav" type="audio/wav" loop>
             </audio>
