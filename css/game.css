@@ -159,7 +159,7 @@ p {
 .timer {
 	font-weight: bold;
 	font-size: 18px;
-	color: yellow;
+	color: #ffd700;
 	display: none; /* Hidden until game starts */
 }
 
@@ -231,6 +231,22 @@ div#gamespace img {
 	justify-content: center;
 	min-height: 65px;
 	line-height: 1.2;
+}
+
+/* Placeholder cards shown before game starts */
+.concept-card.placeholder {
+	background: linear-gradient(135deg, rgba(101, 67, 33, 0.4) 0%, rgba(72, 48, 24, 0.5) 100%);
+	color: rgba(244, 241, 222, 0.4);
+	border: 2px dashed rgba(139, 90, 43, 0.4);
+	cursor: default;
+	font-size: 24px;
+	animation: none;
+}
+
+.concept-card.placeholder:hover {
+	transform: none;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+	border-color: rgba(139, 90, 43, 0.4);
 }
 
 /* Valid and invalid cards look identical - no visual clues */

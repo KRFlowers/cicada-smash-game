@@ -1,10 +1,11 @@
 <!-- 
     Fourier's Forest: Find the Signal in the Noise
-    Created by Kristi Loesch
+    Author: K Flowers
+    Date: January 2025
     
-    A data science game where you extract signal from noise
-    Background bugs = noise, Valid concepts = signal, Invalid = bugs in analysis
-    Demonstrates JavaScript, CSS Grid, statistical knowledge, and real-time analytics
+    AP Statistics concept identification game
+    Three difficulty levels testing statistical knowledge
+    40-second timed challenge with scoring and analytics
 -->
 
 <!DOCTYPE html>
@@ -170,7 +171,7 @@
     background-color: #555;
 }
 
-.diff-easy {
+.diff-level1 {
     background-color: #5cb85c;
     color: white;
     padding: 2px 6px;
@@ -180,7 +181,7 @@
     margin-left: 5px;
 }
 
-.diff-medium {
+.diff-level2 {
     background-color: #f0ad4e;
     color: white;
     padding: 2px 6px;
@@ -190,7 +191,7 @@
     margin-left: 5px;
 }
 
-.diff-hard {
+.diff-level3 {
     background-color: #d9534f;
     color: white;
     padding: 2px 6px;
@@ -208,23 +209,19 @@
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
     <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="data/questions.js"></script>
+    <script type="text/javascript" src="data/questions-levels.js"></script>
     <script type="text/javascript" src="Auz-Bug-8eac7b7/bug-min.js"></script> 
     <script>
-        /* ==================================================
-           GAME LOGIC - FOURIER'S FOREST
-           Statistical concepts quiz game
-           ================================================== */
         
         // Game state variables
         var userScore = 0;
         var gameClock;
         var conceptsDisplayed = [];
-        var secRemaining = 30;
-        var currentDifficulty = 'medium';
-        var totalConceptsToDisplay = 20;
+        var secRemaining = 40;
+        var currentDifficulty = 'level1';
+        var totalConceptsToDisplay = 24;
         
-        // Statistical tracking variables
+        // Metric tracking variables
         var totalClicks = 0;
         var successfulClicks = 0;
         var missedClicks = 0;
@@ -233,19 +230,40 @@
         var validConceptsTotal = 0;
         var validConceptsClicked = 0;
         
-        // ===== QUESTIONS LOADED FROM data/questions.js =====
-        // Edit data/questions.js file to modify game questions
-        // Valid concepts - these are CORRECT statements
-        var validConcepts = questionsData.validConcepts;
-        
-        // Invalid concepts - these are INCORRECT statements (bugs in analysis)
-        var invalidConcepts = questionsData.invalidConcepts;
-        // ===== END EXTERNAL DATA SECTION =====
+        // Load questions from external data file based on level
+        function getQuestionsForLevel() {
+            switch(currentDifficulty) {
+                case 'level1':
+                    return questionsLevel1;
+                case 'level2':
+                    return questionsLevel2;
+                case 'level3':
+                    return questionsLevel3;
+                default:
+                    return questionsLevel1;
+            }
+        }
+
+        // Store valid and invalid concepts
+        var validConcepts = [];
+        var invalidConcepts = [];
+
+        // Initialize empty grid on page load
+        function initializeEmptyGrid() {
+            for (var i = 0; i < 24; i++) {
+                $("#gamespace").append(
+                    `<div class="concept-card placeholder" id="placeholder${i}">?</div>`
+                );
+            }
+        }
 
         $(document).ready(
             function(){
                 $(".timer").show();
                 new BugController({'minBugs':100, 'maxBugs':300});
+                
+                // Display empty grid on load
+                initializeEmptyGrid();
 
                 $("#start_button").on("click",
                     function () {
@@ -267,34 +285,22 @@
 
             });
 
-        // Sets game difficulty level and adjusts grid size and time limit
-        // Parameters: level ('easy', 'medium', or 'hard')
+        // Set difficulty level and adjust grid size and time limit
         function setDifficulty(level) {
             currentDifficulty = level;
-            switch(level) {
-                case 'easy':
-                    totalConceptsToDisplay = 16; // 4x4 grid
-                    secRemaining = 45;
-                    break;
-                case 'medium':
-                    totalConceptsToDisplay = 20; // 4x5 grid
-                    secRemaining = 35;
-                    break;
-                case 'hard':
-                    totalConceptsToDisplay = 24; // 4x6 grid
-                    secRemaining = 30;
-                    break;
-            }
+            totalConceptsToDisplay = 24; // Always use 4x6 grid
+            secRemaining = 40; // 40 seconds for all levels
+            
             $('.difficulty-link').removeClass('active');
             $('#' + level + 'Btn').addClass('active');
         }
 
-        // Generates random x-coordinate for flying bug positioning
+        // Generate random x-coordinate for bug positioning
         function randomNumberx(){
             return Math.floor((Math.random()*543));     
         }           
      
-        // Generates random y-coordinate for flying bug positioning
+        // Generate random y-coordinate for bug positioning
         function randomNumbery(){
             return Math.floor((Math.random()*280));
         }
@@ -343,6 +349,11 @@
                         $(this).addClass('clicked');
                         var clickTime = Date.now() - gameStartTime;
                         clickTimes.push(clickTime);
+                        
+                        // Check for win condition - found all valid concepts
+                        if (validConceptsClicked >= validConceptsTotal) {
+                            endGame();
+                        }
                     });
             
             // Track clicks on INVALID concepts (PENALTY: -1 point)
@@ -360,32 +371,35 @@
             updateTimer();
         }  
         
-        // Updates countdown timer every second
-        // Ends game when timer reaches zero
+        // End game and show results
+        function endGame() {
+            console.log('Game Over - Final Score:', userScore);
+            
+            // Stop everything
+            $('#playSounds')[0].pause();
+            $('#playSounds')[0].currentTime = 0;
+            clearTimeout(gameClock);
+            
+            // Update score displays
+            $(".score").html("Score: " + userScore);
+            
+            // Display simple results
+            displayGameStats();
+            
+            // Show modal
+            $("#gameOverDialog").css('display', 'block');
+            
+            $("#gamespace").off("click");
+            $("#start_button").on("click",
+                function () {
+                    startGame();
+            });
+        }  
+        
+        // Update countdown timer each second and end game at zero
         function updateTimer(){                
             if (secRemaining < 0) {
-                console.log('Game Over - Final Score:', userScore);
-                
-                // When time runs out, stop everything
-                $('#playSounds')[0].pause();
-                $('#playSounds')[0].currentTime = 0;
-                clearTimeout(gameClock);
-                
-                // Update score displays
-                $(".score").html("Score: " + userScore);
-                
-                // Calculate and display statistics
-                displayGameStats();
-                
-                // Show modal
-                $("#gameOverDialog").css('display', 'block');
-                console.log('Modal should be visible now');
-                
-                $("#gamespace").off("click");
-                $("#start_button").on("click",
-                    function () {
-                        startGame();
-                });
+                endGame();
             }  
             else{ 
                 $(".timer").html("Time: " + secRemaining + "s");
@@ -394,11 +408,15 @@
             }                    
         }
         
-        // Creates and displays a mix of valid and invalid concept cards on the game board
-        // 60% valid concepts (signal), 40% invalid concepts (noise)
+        // Create and display mixed valid and invalid concept cards
         function displayAllConcepts() {
-            // Create a mix of valid and invalid concepts (60% valid, 40% invalid)
-            var numValid = Math.floor(totalConceptsToDisplay * 0.6);
+            // Load questions for current level
+            var currentQuestions = getQuestionsForLevel();
+            validConcepts = currentQuestions.validConcepts;
+            invalidConcepts = currentQuestions.invalidConcepts;
+            
+            // Create a mix of valid and invalid concepts (50% valid, 50% invalid)
+            var numValid = Math.floor(totalConceptsToDisplay * 0.5);
             var numInvalid = totalConceptsToDisplay - numValid;
             
             var selectedConcepts = [];
@@ -422,7 +440,7 @@
             // Add helpful header showing target
             $("#gamespace").prepend(
                 `<div id="gameGoal" style="grid-column: 1 / -1; background: rgba(34, 139, 34, 0.2); padding: 8px; border: 2px solid rgba(139, 90, 43, 0.8); border-radius: 6px; text-align: center; font-weight: 600; color: #f4f1de; font-size: 13px; margin-bottom: 8px;">
-                    Find ${numValid} signal concepts | Avoid ${numInvalid} bugs in analysis | Perfect Score = ${numValid}
+                    Find ${numValid} valid concepts | Avoid ${numInvalid} invalid concepts | Perfect Score = ${numValid}
                 </div>`
             );
             
@@ -435,74 +453,24 @@
             });
         }
 
-        // Calculates and displays game statistics in the end-game modal
-        // Shows accuracy, identification rate, and average reaction time
+        // Display simple game results
         function displayGameStats() {
-            console.log('displayGameStats called - Score:', userScore, 'Valid Total:', validConceptsTotal);
-            
             // Set final score in modal
             $('#finalScore').text(userScore);
             $('#totalValid').text(validConceptsTotal);
-            
-            // Calculate statistics
-            var accuracy = totalClicks > 0 ? ((validConceptsClicked / totalClicks) * 100).toFixed(1) : 0;
-            var identificationRate = validConceptsTotal > 0 ? ((validConceptsClicked / validConceptsTotal) * 100).toFixed(1) : 0;
-            var avgReactionTime = clickTimes.length > 0 ? (clickTimes.reduce((a, b) => a + b, 0) / clickTimes.length / 1000).toFixed(2) : 0;
-            
-            console.log('Stats calculated - Accuracy:', accuracy, 'ID Rate:', identificationRate);
-            
-            // Build stats HTML
-            var statsHTML = `
-                <h3>Game Statistics</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">Difficulty:</span>
-                        <span class="stat-value">${currentDifficulty.toUpperCase()}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Final Score:</span>
-                        <span class="stat-value">${userScore}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Click Accuracy:</span>
-                        <span class="stat-value">${accuracy}%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Valid Concepts Found:</span>
-                        <span class="stat-value">${validConceptsClicked} / ${validConceptsTotal}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Identification Rate:</span>
-                        <span class="stat-value">${identificationRate}%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Wrong Clicks:</span>
-                        <span class="stat-value">${missedClicks}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Avg Click Time:</span>
-                        <span class="stat-value">${avgReactionTime}s</span>
-                    </div>
-                </div>
-            `;
             
             // Store game in history
             saveGameHistory({
                 date: new Date().toLocaleDateString(),
                 score: userScore,
-                difficulty: currentDifficulty,
-                accuracy: accuracy,
-                identificationRate: identificationRate,
-                avgReactionTime: avgReactionTime
+                difficulty: currentDifficulty
             });
             
-            // Display stats
-            $("#gameStats").html(statsHTML);
+            // Display history
             displayGameHistory();
         }
         
-        // Saves game results to local storage
-        // Keeps only the last 10 games for history tracking
+        // Save game results to local storage last 10
         function saveGameHistory(gameData) {
             var history = JSON.parse(localStorage.getItem('statGameHistory') || '[]');
             history.push(gameData);
@@ -513,8 +481,7 @@
             localStorage.setItem('statGameHistory', JSON.stringify(history));
         }
         
-        // Displays recent game history from local storage
-        // Shows date, difficulty, score, and accuracy for each game
+        // Display recent game history from local storage
         function displayGameHistory() {
             var history = JSON.parse(localStorage.getItem('statGameHistory') || '[]');
             if (history.length === 0) {
@@ -528,8 +495,7 @@
                 historyHTML += `
                     <div class="history-item">
                         <span class="history-date">${game.date} ${diffBadge}</span>
-                        <span class="history-score">Score: ${game.score}</span>
-                        <span class="history-accuracy">Acc: ${game.accuracy}%</span>
+                        <span class="history-score">Score: ${game.score} / 12</span>
                     </div>
                 `;
             });
@@ -552,9 +518,8 @@
             
             // Game over modal handlers
             $(document).on('click', '#playAgainBtn', function() {
-                console.log('Play Again clicked');
+                console.log('Close clicked');
                 $('#gameOverDialog').hide();
-                startGame();
             });
             
             $(document).on('click', '#exitBtn', function() {
@@ -582,26 +547,25 @@
 
         <div class="title-section">
             <h1>Fourier's Forest <span id="infoIcon" class="info-icon" title="About Joseph Fourier">ⓘ</span></h1>
-            <p class="tagline">Find the Signal in the Noise</p>
+            <p class="tagline">Can you find the signal in the noise?</p>
         </div>
 	    
         <div id="control-panel">
             <p class="instructions-text">
-                <strong>Test your stats knowledge!</strong><br>
-                Click valid concepts (<span class="highlight">signal</span>). Avoid errors (<span class="highlight">noise</span>). &nbsp; +1 correct | -1 incorrect
+                Click valid concepts (+1) | Avoid invalid concepts (-1)
             </p>
             
             <div class="game-controls">
                 <div class="difficulty-section">
-                    <span class="control-label">Difficulty:</span>
-                    <span class="difficulty-link" id="easyBtn" onclick="setDifficulty('easy')">Easy</span>
-                    <span class="difficulty-link active" id="mediumBtn" onclick="setDifficulty('medium')">Medium</span>
-                    <span class="difficulty-link" id="hardBtn" onclick="setDifficulty('hard')">Hard</span>
+                    <span class="control-label">Difficulty Level:</span>
+                    <span class="difficulty-link active" id="level1Btn" onclick="setDifficulty('level1')">1</span>
+                    <span class="difficulty-link" id="level2Btn" onclick="setDifficulty('level2')">2</span>
+                    <span class="difficulty-link" id="level3Btn" onclick="setDifficulty('level3')">3</span>
                 </div>
                 
                 <div class="game-info">
                     <span class="score" title="Your score">Score: 0</span>
-                    <span class="timer" title="Seconds remaining">Time: 35s</span>
+                    <span class="timer" title="Seconds remaining">Time: 40s</span>
                     <button type="button" id="start_button" title="Click to start">Start</button>
                 </div>
             </div>
@@ -618,16 +582,17 @@
                     
                     <div id="gameHistory"></div>
                     
-                    <button class="close-button" id="playAgainBtn">Play Again</button>
-                    <button class="exit-button" id="exitBtn">Exit</button>
+                    <button class="close-button" id="playAgainBtn">Close</button>
                 </div>
             </div>
             
             <!-- Fourier Info Modal -->
             <div id="fourierInfoDialog" class="custom-modal">
                 <div class="modal-content info-modal">
-                    <h2>Joseph Fourier (1768-1830)</h2>
-                    <p>French mathematician who showed that complex signals can be broken down into simple waves - a concept now known as Fourier analysis. This idea is foundational in statistics because it helps separate meaningful patterns (signal) from random variation (noise). Fourier methods are used in time-series analysis, image processing, and detecting hidden trends in data.</p>
+                    <h2>Joseph Fourier (1768–1830)</h2>
+                    <p>Joseph Fourier (1768–1830) was a French mathematician who demonstrated that complex signals can be expressed as combinations of simple waves, a principle now known as Fourier analysis.</p>
+                    <p>This idea is important in statistics because it provides a framework for distinguishing systematic patterns (signal) from random variation (noise) in data.</p>
+                    <p>Fourier methods are widely used in time-series analysis, image processing, and other applications where identifying underlying structure in data is essential.</p>
                     
                     <button class="close-button" id="closeFourierInfo">Close</button>
                 </div>
