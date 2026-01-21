@@ -1,9 +1,7 @@
-# Fourier's Forest
+# Fourier’s Forest
 **Find the Signal in the Noise**
 
-Fourier's Forest is a statistics quiz game with a forest theme background built in JavaScript. It was originally created as a class project and later extended to add data science quiz elements. Give it a try and test your knowledge!
-
-Questions have been created in alignment with AP Statistics course.
+Fourier’s Forest is an interactive JavaScript quiz game designed to reinforce statistics concepts in a timed, grid-based format. The project combines front-end development with applied statistics content aligned with AP Statistics.
 
 **JavaScript concepts practiced:**
 - DOM manipulation and event handling
@@ -14,7 +12,7 @@ Questions have been created in alignment with AP Statistics course.
 - Click tracking and performance analytics
 - Modal dialogs and UI interactions
 
-## How to Play
+## Gameplay
 
 1. Open `index.html` in your browser
 2. Select a difficulty level (Easy, Medium, or Hard)
@@ -46,7 +44,7 @@ Questions have been created in alignment with AP Statistics course.
 - Forest-themed visual design with animated background
 - Info modal about Joseph Fourier
 
-## Tech Used
+## Tech Stack
 
 - HTML5/CSS3 with CSS Grid
 - JavaScript and jQuery
