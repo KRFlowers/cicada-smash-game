@@ -1,18 +1,16 @@
 # Fourier’s Forest
 **Find the Signal in the Noise**
 
-Fourier’s Forest is an interactive JavaScript quiz game designed to reinforce statistics concepts in a timed, grid-based format. The project combines front-end development with applied statistics content aligned with AP Statistics.
+Fourier’s Forest is an interactive statistics quiz game developed in JavaScript. The project focuses on front-end development and presents questions in a timed, grid-based format. The questions are drawn from AP Statistics concepts and increase in difficulty as the game progresses.
 
-**JavaScript concepts practiced:**
+**JavaScript & Front-End Concepts Practiced:**
 - DOM manipulation and event handling
 - CSS Grid layout for responsive card positioning
 - jQuery for dynamic content generation
-- localStorage API for persistent game history
 - Timer functions and game state management
-- Click tracking and performance analytics
 - Modal dialogs and UI interactions
 
-## Gameplay
+### Gameplay
 
 1. Open `index.html` in your browser
 2. Select a difficulty level (Easy, Medium, or Hard)
@@ -21,53 +19,41 @@ Fourier’s Forest is an interactive JavaScript quiz game designed to reinforce 
 5. Avoid invalid concepts (they subtract points)
 6. Win by finding more signal than noise before time runs out
 
-## Difficulty Levels
+### Difficulty Levels
 
-**Level 1 (Easy): Foundational Concepts**
-- Basic terminology, simple calculations, and fundamental principles
-- Mean, median, mode, standard deviation, z-scores, correlation
+**Level 1 (Easy): Descriptive Statistics**  
+Measures of center and spread, data types, basic graphs, and correlation
 
-**Level 2 (Medium): Inference & Probability**
-- Probability rules, sampling distributions, confidence intervals, hypothesis testing
-- Binomial/normal distributions, Central Limit Theorem, p-values, Type I/II errors
+**Level 2 (Medium): Probability & Inference**  
+Probability rules, distributions, sampling distributions, confidence intervals, and hypothesis testing
 
-**Level 3 (Hard): Advanced Inference & Modeling**
-- Complex inference, regression, chi-square, ANOVA, experimental design
-- Residual analysis, r², confounding variables, randomization, Simpson's Paradox
+**Level 3 (Hard): Modeling & Experimental Design**  
+Regression, chi-square tests, ANOVA, residual analysis, and experimental design concepts
 
-## Features
 
-- Three difficulty levels with varying grid sizes and time limits
-- Scoring system: +1 for correct, -1 for incorrect
-- End-game statistics (accuracy, identification rate, reaction time)
-- Game history saved in browser (last 10 games)
-- Forest-themed visual design with animated background
-- Info modal about Joseph Fourier
+### Features
 
-## Tech Stack
+- **Three difficulty levels** with varying grid sizes and time limits
+- **Scoring system:** +1 for correct, -1 for incorrect
+- **Game history saved locally** (last 10 games)
+- **Forest-themed visual design** with animated background
+- **Info modal** about Joseph Fourier
+- **Desktop only gameplay** - mobile not supported
+- **Question sets configurable** in `data/questions.js`
+
+### Tech Stack
 
 - HTML5/CSS3 with CSS Grid
 - JavaScript and jQuery
-- localStorage for game history
 - Bug animation library by Auz
 
-## Notes
+### Credits
+- Bug animation library by [Auz](https://github.com/Auz/Bug), Forest background from Pixabay, Cicada sound effect from Notification Sounds
 
-Desktop only - mobile support not implemented.
-
-Questions can be edited in `data/questions.js`.
-
-## Credits
-
-- Bug animation library by [Auz](https://github.com/Auz/Bug)
-- Forest background from Pixabay
-- Cicada sound effect from Notification Sounds
-
-## License
-
-MIT License
-
+### License: MIT License
 ---
-
 **Author:** K Flowers  
 **Contact:** kristirflowers@gmail.com
+
+![Fourier’s Forest gameplay](fouriers-forest-gameplay.png)
+
